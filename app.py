@@ -4,29 +4,40 @@
 # In[ ]:
 
 
-from flask import Flask,render_template,request
-import os
+import replicate
+from flask import Flask, render_template, request
+import json,time,requests
+
 
 app = Flask(__name__)
 
-import openai
-
-openai.api_key = "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"
-
 @app.route("/",methods=["GET","POST"])
-
 def index():
     if request.method == "POST":
-        t = request.form.get("txt")
-        response = openai.Image.create(prompt=t,n=1)
-        image_url = response['data'][0]['url']
-        print(image_url)
-        return(render_template("index.html",result=image_url))
+        q = request.form.get("question")
+        body = json.dumps(
+                    {
+                        "version":"db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+                        "input":{
+                            "prompt":q
+                        }
+                    }
+        )
+        headers = {
+            'Authorization':'Token r8_7RgFIsXNy75WqXb2JKQjsgKj2Rexv720vHqw1',
+            'Content-Type':'application/json'
+        }
+        output = requests.post('https://api.replicate.com/v1/predictions',data=body,headers=headers)
+        time.sleep(10)
+        get_url = output.json()['urls']['get']
+        get_result = requests.post(get_url,headers = headers).json()['output']
+        return(render_template("index.html",result = get_result[0]))
     else:
-        return(render_template("index.html",result="waiting"))
-if __name__ == "__main__":
-    app.run()
+         return(render_template("index.html",result = "waiting"))
+        
 
+if __name__ =="__main__":
+    app.run()
 
 # In[ ]:
 
