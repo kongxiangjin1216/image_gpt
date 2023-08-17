@@ -14,7 +14,7 @@ app = Flask(__name__)
 @app.route("/",methods=["GET","POST"])
 def index():
     if request.method == "POST":
-        q = request.form.get("question")
+        q = request.form.get("txt")
         body = json.dumps(
                     {
                         "version":"db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
